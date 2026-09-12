@@ -10,6 +10,7 @@
         input{flex:1;padding:10px;font-size:16px;}
         button{padding:10px 16px;background:#2563eb;color:white;border:none;border-radius:4px;cursor:pointer;}
         li{padding:8px 0;font-size:17px;display:flex;justify-content:space-between;border-bottom:1px solid #eee;}
+        .delBtn{background-color:red;padding:4px 8px;font-size:14px;}
     </style>
 </head>
 <body>
@@ -26,10 +27,17 @@
             if(!val)return;
             let li = document.createElement('li');
             li.innerText = val;
+            // 删除按钮
+            let delBtn = document.createElement("button");
+            delBtn.innerText = "删除";
+            delBtn.className = "delBtn";
+            delBtn.onclick = function(){
+                li.remove();
+            }
+            li.appendChild(delBtn);
             document.getElementById('todoList').appendChild(li);
             document.getElementById('todoInput').value = "";
         }
     </script>
 </body>
 </html>
-><div id="activity-entrance-popup-root"></div><div class="" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-describedby="t9qqmc2" data-popupid="t9qqmc2" style="position: fixed; left: 0px; top: 0px; width: 1px; height: 1px;"></div><span data-radix-focus-guard="" tabindex="0" style="outline: none; opacity: 0; position: fixed; pointer-events: none;"></span><div class="" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-describedby="9k4cjx2" data-popupid="9k4cjx2" style="position: fixed; left: 0px; top: 0px; width: 1px; height: 1px;"></div></body></html>
