@@ -1,43 +1,264 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>我的待办清单</title>
-    <style>
-        body{font-family:微软雅黑;max-width:500px;margin:30px auto;padding:0 20px;}
-        h1{text-align:center;color:#333;}
-        .input-box{display:flex;gap:8px;margin-bottom:20px;}
-        input{flex:1;padding:10px;font-size:16px;}
-        button{padding:10px 16px;background:#2563eb;color:white;border:none;border-radius:4px;cursor:pointer;}
-        li{padding:8px 0;font-size:17px;display:flex;justify-content:space-between;border-bottom:1px solid #eee;}
-        .delBtn{background-color:red;padding:4px 8px;font-size:14px;}
-    </style>
-</head>
-<body>
-    <h1>待办清单</h1>
-    <div class="input-box">
-        <input id="todoInput" placeholder="输入待办事项">
-        <button onclick="addTodo()">添加</button>
-    </div>
-    <ul id="todoList"></ul>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>我的待办清单</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  }
 
-    <script>
-        function addTodo(){
-            let val = document.getElementById('todoInput').value.trim();
-            if(!val)return;
-            let li = document.createElement('li');
-            li.innerText = val;
-            // 删除按钮
-            let delBtn = document.createElement("button");
-            delBtn.innerText = "删除";
-            delBtn.className = "delBtn";
-            delBtn.onclick = function(){
-                li.remove();
-            }
-            li.appendChild(delBtn);
-            document.getElementById('todoList').appendChild(li);
-            document.getElementById('todoInput').value = "";
-        }
-    </script>
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fff4d6, #ffe4f1, #e4f7ff);
+    padding: 30px 20px;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(255, 210, 120, 0.35) 0, transparent 25%),
+      radial-gradient(circle at 85% 10%, rgba(255, 180, 210, 0.35) 0, transparent 28%),
+      radial-gradient(circle at 15% 85%, rgba(160, 220, 255, 0.35) 0, transparent 30%),
+      linear-gradient(135deg, #fff4d6, #ffe4f1, #e4f7ff);
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* 小动物装饰 */
+  .animal {
+    position: fixed;
+    font-size: 44px;
+    z-index: 1;
+    user-select: none;
+  }
+  .cat { top: 18px; left: 6%; }
+  .rabbit { top: 40px; right: 5%; }
+  .bear { bottom: 30px; left: 4%; }
+  .bird { bottom: 50px; right: 8%; }
+
+  .container {
+    max-width: 560px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.96);
+    padding: 30px;
+    border-radius: 28px;
+    box-shadow: 0 12px 30px rgba(255, 182, 193, 0.25);
+    border: 3px dashed #ffd1dc;
+    position: relative;
+    z-index: 2;
+  }
+
+  h1 {
+    text-align: center;
+    color: #ff7aa2;
+    font-size: 30px;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #8fa3b7;
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .input-wrap {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  input {
+    flex: 1;
+    padding: 13px 16px;
+    border: 2px solid #ffd6e7;
+    border-radius: 16px;
+    font-size: 15px;
+    outline: none;
+    background: #fff9fc;
+  }
+
+  input:focus {
+    border-color: #ff9ec7;
+  }
+
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 16px;
+    font-size: 15px;
+    transition: 0.2s;
+  }
+
+  #addBtn {
+    padding: 13px 22px;
+    background: linear-gradient(135deg, #ff9ec7, #ffb6d9);
+    color: white;
+    font-weight: bold;
+  }
+
+  #addBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(255, 158, 199, 0.4);
+  }
+
+  .section-title {
+    font-size: 16px;
+    color: #6b7c93;
+    margin: 18px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff7fb;
+    padding: 12px 14px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    border: 1px solid #ffe4f1;
+    animation: pop 0.25s ease;
+  }
+
+  @keyframes pop {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .checkbox {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #ff9ec7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    background: white;
+    font-size: 14px;
+    color: transparent;
+    transition: 0.2s;
+  }
+
+  .checkbox.checked {
+    background: #ff9ec7;
+    color: white;
+  }
+
+  .task-text {
+    flex: 1;
+    font-size: 15px;
+    color: #4a5568;
+    word-break: break-all;
+  }
+
+  .task-item.done .task-text {
+    text-decoration: line-through;
+    color: #a0aec0;
+  }
+
+  .del-btn {
+    padding: 7px 12px;
+    background: #ffd1dc;
+    color: #d6336c;
+    font-size: 13px;
+  }
+
+  .del-btn:hover {
+    background: #ffb3c6;
+  }
+
+  .empty {
+    color: #a0aec0;
+    font-size: 14px;
+    text-align: center;
+    padding: 16px 0;
+  }
+</style>
+</head>
+
+<body>
+  <div class="animal cat">🐱</div>
+  <div class="animal rabbit">🐰</div>
+  <div class="animal bear">🐻</div>
+  <div class="animal bird">🐦</div>
+
+  <div class="container">
+    <h1>🐾 我的待办清单 🐾</h1>
+    <p class="subtitle">把小事一件一件完成，今天也很棒！</p>
+
+    <div class="input-wrap">
+      <input type="text" id="taskInput" placeholder="添加一个新任务..." />
+      <button id="addBtn">添加</button>
+    </div>
+
+    <div class="section-title">📌 进行中</div>
+    <div id="todoList"></div>
+
+    <div class="section-title">✅ 已完成</div>
+    <div id="doneList"></div>
+  </div>
+
+<script>
+  const input = document.getElementById('taskInput');
+  const addBtn = document.getElementById('addBtn');
+  const todoList = document.getElementById('todoList');
+  const doneList = document.getElementById('doneList');
+
+  function createTask(text) {
+    const item = document.createElement('div');
+    item.className = 'task-item';
+
+    const checkbox = document.createElement('div');
+    checkbox.className = 'checkbox';
+    checkbox.innerText = '✓';
+
+    const span = document.createElement('span');
+    span.className = 'task-text';
+    span.innerText = text;
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'del-btn';
+    delBtn.innerText = '删除';
+
+    item.appendChild(checkbox);
+    item.appendChild(span);
+    item.appendChild(delBtn);
+
+    checkbox.onclick = function () {
+      item.classList.toggle('done');
+      checkbox.classList.toggle('checked');
+      if (item.classList.contains('done')) {
+        doneList.appendChild(item);
+      } else {
+        todoList.appendChild(item);
+      }
+    };
+
+    delBtn.onclick = function () {
+      item.remove();
+    };
+
+    return item;
+  }
+
+  function addTask() {
+    const text = input.value.trim();
+    if (!text) return;
+    const task = createTask(text);
+    todoList.appendChild(task);
+    input.value = '';
+  }
+
+  addBtn.onclick = addTask;
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') addTask();
+  });
+</script>
 </body>
 </html>
